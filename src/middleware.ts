@@ -70,10 +70,10 @@ export async function middleware(req: NextRequest) {
                 .eq('id', session.user.id)
                 .single();
 
-            userRole = profile?.role || 'worker';
+            userRole = profile?.role ?? 'worker';
 
             // Cache the role in a cookie for 1 hour
-            res.cookies.set(ROLE_COOKIE_NAME, userRole, {
+            res.cookies.set(ROLE_COOKIE_NAME, userRole as string, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
