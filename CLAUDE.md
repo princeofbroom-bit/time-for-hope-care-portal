@@ -1,7 +1,9 @@
-# Time For Hope - NDIS Support Platform
+# Time For Hope Care Portal
 
 ## Project Overview
-NDIS (National Disability Insurance Scheme) support coordination platform built for Time For Hope. Manages workers, clients, compliance documents, and electronic document signing.
+Time For Hope - NDIS support platform for managing workers, clients, compliance documents, and electronic document signing.
+
+**Repository**: `time-for-hope-care-portal`
 
 ## Tech Stack
 - **Framework**: Next.js 16 with App Router & Turbopack

@@ -1,8 +1,8 @@
-# Time For Hope
+# Time For Hope Care Portal
 
-**NDIS & Aged Care Management Platform**
+**NDIS Support Platform for Managing Workers, Clients, and Compliance**
 
-A comprehensive platform for managing NDIS and Aged Care services, designed for clients, support workers, and administrators. Features electronic document signing, user management, and real-time analytics.
+A comprehensive platform for managing NDIS and Aged Care services, designed for clients, support workers, and administrators. Features electronic document signing, worker compliance tracking, and real-time analytics.
 
 ---
 
@@ -17,8 +17,8 @@ A comprehensive platform for managing NDIS and Aged Care services, designed for 
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
-   cd Time-For-Hope
+   git clone https://github.com/YOUR_USERNAME/time-for-hope-care-portal.git
+   cd time-for-hope-care-portal
    ```
 
 2. **Install dependencies:**
