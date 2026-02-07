@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -12,31 +12,13 @@ export async function middleware(req: NextRequest) {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
             cookies: {
-                get(name: string) {
-                    return req.cookies.get(name)?.value;
+                getAll() {
+                    return req.cookies.getAll();
                 },
-                set(name: string, value: string, options: CookieOptions) {
-                    req.cookies.set({
-                        name,
-                        value,
-                        ...options,
-                    });
-                    res.cookies.set({
-                        name,
-                        value,
-                        ...options,
-                    });
-                },
-                remove(name: string, options: CookieOptions) {
-                    req.cookies.set({
-                        name,
-                        value: '',
-                        ...options,
-                    });
-                    res.cookies.set({
-                        name,
-                        value: '',
-                        ...options,
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value, options }) => {
+                        req.cookies.set(name, value);
+                        res.cookies.set(name, value, options);
                     });
                 },
             },
@@ -73,7 +55,7 @@ export async function middleware(req: NextRequest) {
             userRole = profile?.role ?? 'worker';
 
             // Cache the role in a cookie for 1 hour
-            res.cookies.set(ROLE_COOKIE_NAME, userRole as string, {
+            res.cookies.set(ROLE_COOKIE_NAME, userRole, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
