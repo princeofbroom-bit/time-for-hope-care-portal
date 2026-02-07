@@ -42,7 +42,7 @@ export async function middleware(req: NextRequest) {
     // 2. If user IS logged in
     if (session) {
         // Try to get role from cookie first (fast path)
-        let userRole = req.cookies.get(ROLE_COOKIE_NAME)?.value;
+        let userRole: string = req.cookies.get(ROLE_COOKIE_NAME)?.value || '';
 
         // Only fetch from DB if no cached role
         if (!userRole) {
@@ -52,7 +52,7 @@ export async function middleware(req: NextRequest) {
                 .eq('id', session.user.id)
                 .single();
 
-            userRole = profile?.role ?? 'worker';
+            userRole = profile?.role || 'worker';
 
             // Cache the role in a cookie for 1 hour
             res.cookies.set(ROLE_COOKIE_NAME, userRole, {
