@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -24,7 +24,7 @@ interface DocumentTemplate {
   template_type: string;
 }
 
-export default function NewSigningRequestPage() {
+function NewSigningRequestContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedTemplate = searchParams.get('template');
@@ -526,5 +526,13 @@ export default function NewSigningRequestPage() {
         }
       `}</style>
     </DashboardLayout>
+  );
+}
+
+export default function NewSigningRequestPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewSigningRequestContent />
+    </Suspense>
   );
 }
