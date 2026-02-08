@@ -29,29 +29,8 @@ export default function LoginPage() {
       if (authError) throw authError;
 
       if (data.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-
-        if (profileError) {
-          throw new Error(`Database Error: ${profileError.message}`);
-        }
-
-        if (!profile) {
-          throw new Error("No profile found for your account.");
-        }
-
-        const userRole = profile?.role || 'worker';
-
-        document.cookie = `user_role=${userRole}; path=/; max-age=3600; samesite=lax`;
-
-        const dashboardPath = (userRole === 'admin' || userRole === 'super_admin')
-          ? '/dashboard/admin'
-          : `/dashboard/${userRole}`;
-
-        window.location.href = dashboardPath;
+        // Redirect to dashboard - middleware handles role-based routing
+        window.location.href = '/dashboard/admin';
       }
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
