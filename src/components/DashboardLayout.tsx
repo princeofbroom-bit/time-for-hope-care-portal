@@ -18,14 +18,14 @@ export default function DashboardLayout({
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const supabase = getSupabase();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserEmail(user.email ?? null);
+    // Use getSession() instead of getUser() - reads from local storage (instant)
+    // Middleware already validated auth, this is just for displaying the email
+    const supabase = getSupabase();
+    supabase.auth.getSession().then(({ data }: any) => {
+      if (data?.session) {
+        setUserEmail(data.session.user.email ?? null);
       }
-    };
-    fetchUser();
+    });
   }, []);
 
   const handleLogout = async () => {

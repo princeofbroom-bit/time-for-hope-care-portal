@@ -1,17 +1,15 @@
-import { createBrowserClient } from '@supabase/auth-helpers-nextjs';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 
-let supabaseInstance: SupabaseClient | null = null;
+let supabaseInstance: ReturnType<typeof createBrowserClient> | null = null;
 
 export const getSupabase = () => {
     if (supabaseInstance) {
         return supabaseInstance;
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder';
-
-    // Use browser client that syncs with cookies for middleware compatibility
-    supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey);
+    supabaseInstance = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
     return supabaseInstance;
 };

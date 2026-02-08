@@ -74,7 +74,7 @@ export default function AdminInvitePage() {
       .order('created_at', { ascending: false });
 
     const allInvites = [
-      ...(adminInvites || []).map(inv => ({ ...inv, role: 'admin' })),
+      ...(adminInvites || []).map((inv: any) => ({ ...inv, role: 'admin' })),
       ...(userInvites || [])
     ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 

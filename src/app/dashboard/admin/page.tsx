@@ -41,27 +41,27 @@ export default function AdminDashboard() {
     const supabase = getSupabase();
 
     try {
-      // Run all queries in parallel for faster loading
+      // Run all queries in parallel - select only needed columns
       const [profilesResult, signingResult, templatesResult] = await Promise.all([
         supabase.from('profiles').select('id, role, full_name, updated_at'),
-        supabase.from('signing_requests').select('id, status'),
-        supabase.from('document_templates').select('id').eq('is_active', true),
+        supabase.from('signing_requests').select('status'),
+        supabase.from('document_templates').select('id', { count: 'exact', head: true }).eq('is_active', true),
       ]);
 
-      const profiles = profilesResult.data || [];
-      const signingRequests = signingResult.data || [];
-      const templates = templatesResult.data || [];
+      const profiles: any[] = profilesResult.data || [];
+      const signingRequests: any[] = signingResult.data || [];
+      const templateCount = templatesResult.count || 0;
 
-      const workers = profiles.filter(p => p.role === 'worker');
-      const clients = profiles.filter(p => p.role === 'client');
-      const admins = profiles.filter(p => p.role === 'admin' || p.role === 'super_admin');
+      const workers = profiles.filter((p: any) => p.role === 'worker');
+      const clients = profiles.filter((p: any) => p.role === 'client');
+      const admins = profiles.filter((p: any) => p.role === 'admin' || p.role === 'super_admin');
 
-      const pending = signingRequests.filter(s => ['pending', 'sent', 'viewed'].includes(s.status));
-      const completed = signingRequests.filter(s => s.status === 'signed');
+      const pending = signingRequests.filter((s: any) => ['pending', 'sent', 'viewed'].includes(s.status));
+      const completed = signingRequests.filter((s: any) => s.status === 'signed');
 
       // Reuse profiles data for recent users (sorted by updated_at, top 5)
       const recentUsers = [...profiles]
-        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+        .sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
         .slice(0, 5)
         .map(p => ({
           id: p.id,
@@ -77,7 +77,7 @@ export default function AdminDashboard() {
         admins: admins.length,
         pendingSignatures: pending.length,
         completedSignatures: completed.length,
-        totalDocuments: templates.length,
+        totalDocuments: templateCount,
         recentUsers,
       });
     } catch (error) {
