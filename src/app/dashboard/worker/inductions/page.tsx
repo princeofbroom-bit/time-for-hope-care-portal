@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+
 import { GraduationCap, CheckCircle2, PlayCircle, ChevronRight } from "lucide-react";
 
 const MODULES = [
@@ -24,7 +24,7 @@ export default function InductionsPage() {
     };
 
     return (
-        <DashboardLayout role="worker">
+        <>
             <div className="page-header">
                 <h1>Induction Training</h1>
                 <p>Complete these modules to finish your onboarding process.</p>
@@ -175,6 +175,6 @@ export default function InductionsPage() {
           color: #64748b;
         }
       `}</style>
-        </DashboardLayout>
+        </>
     );
 }

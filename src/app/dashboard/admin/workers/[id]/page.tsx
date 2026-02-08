@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import DashboardLayout from "@/components/DashboardLayout";
+
 import { getSupabase } from "@/lib/supabase";
 import { ArrowLeft, User, Mail, Phone, Calendar, Shield, Edit, Trash2 } from "lucide-react";
 
@@ -67,27 +67,27 @@ export default function WorkerDetailPage() {
 
   if (loading) {
     return (
-      <DashboardLayout role="admin">
+      <>
         <div className="loading-state">Loading user details...</div>
-      </DashboardLayout>
+      </>
     );
   }
 
   if (error || !user) {
     return (
-      <DashboardLayout role="admin">
+      <>
         <div className="error-state">
           <p>{error || 'User not found'}</p>
           <Link href="/dashboard/admin/workers" className="back-btn">
             Back to Users
           </Link>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
   return (
-    <DashboardLayout role="admin">
+    <>
       <div className="page-header">
         <Link href="/dashboard/admin/workers" className="back-link">
           <ArrowLeft size={20} />
@@ -331,6 +331,6 @@ export default function WorkerDetailPage() {
           word-break: break-all;
         }
       `}</style>
-    </DashboardLayout>
+    </>
   );
 }

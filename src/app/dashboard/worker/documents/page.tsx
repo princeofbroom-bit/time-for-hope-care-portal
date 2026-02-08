@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+
 import { Upload, FileCheck, AlertCircle, Clock } from "lucide-react";
 
 const REQUIRED_DOCS = [
@@ -69,7 +69,7 @@ export default function DocumentUploadPage() {
   };
 
   return (
-    <DashboardLayout role="worker">
+    <>
       <div className="page-header">
         <h1>My Documents</h1>
         <p>Ensure all compliance documents are uploaded and valid (Max 50MB).</p>
@@ -215,6 +215,6 @@ export default function DocumentUploadPage() {
           color: white;
         }
       `}</style>
-    </DashboardLayout>
+    </>
   );
 }

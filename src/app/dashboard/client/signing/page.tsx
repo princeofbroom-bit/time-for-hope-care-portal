@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import DashboardLayout from "@/components/DashboardLayout";
+
 import { FileText, Clock, CheckCircle, AlertCircle, ChevronRight, Download } from "lucide-react";
 
 interface PendingDocument {
@@ -98,7 +98,7 @@ export default function ClientSigningPage() {
   };
 
   return (
-    <DashboardLayout role="client">
+    <>
       <div className="welcome-banner">
         <h1>Document Signing</h1>
         <p>Review and sign your documents</p>
@@ -468,6 +468,6 @@ export default function ClientSigningPage() {
           }
         }
       `}</style>
-    </DashboardLayout>
+    </>
   );
 }

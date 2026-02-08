@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import DashboardLayout from "@/components/DashboardLayout";
+
 import { getSupabase } from "@/lib/supabase";
 import {
   Users, AlertCircle, TrendingUp, ChevronRight,
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
     : 0;
 
   return (
-    <DashboardLayout role="admin">
+    <>
       <div className="welcome-banner">
         <h1>Admin Dashboard</h1>
         <p>Overview of users, documents, and compliance status across the organization.</p>
@@ -588,6 +588,6 @@ export default function AdminDashboard() {
           color: var(--primary-color);
         }
       `}</style>
-    </DashboardLayout>
+    </>
   );
 }

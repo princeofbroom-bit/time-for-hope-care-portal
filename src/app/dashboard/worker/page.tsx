@@ -1,11 +1,11 @@
 "use client";
 
-import DashboardLayout from "@/components/DashboardLayout";
+
 import { FileText, GraduationCap, CheckCircle } from "lucide-react";
 
 export default function WorkerDashboard() {
     return (
-        <DashboardLayout role="worker">
+        <>
             <div className="welcome-banner">
                 <h1>Hello, Support Worker</h1>
                 <p>Keep your profile details and documents up to date for compliance.</p>
@@ -138,6 +138,6 @@ export default function WorkerDashboard() {
           color: #94a3b8;
         }
       `}</style>
-        </DashboardLayout>
+        </>
     );
 }

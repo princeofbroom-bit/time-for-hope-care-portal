@@ -2,89 +2,41 @@
 
 import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
-import { Heart, Calendar, FileText, User, LogOut, Clock, CheckCircle } from "lucide-react";
+
+import { Calendar, FileText, User, Clock, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function ClientDashboard() {
-    const [user, setUser] = useState<any>(null);
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const router = useRouter();
     const supabase = getSupabase();
 
     useEffect(() => {
-        checkUser();
+        const fetchProfile = async () => {
+            const { data: { session } }: any = await supabase.auth.getSession();
+            if (session) {
+                const { data } = await supabase
+                    .from('profiles')
+                    .select('full_name')
+                    .eq('id', session.user.id)
+                    .single();
+                setProfile(data);
+            }
+            setLoading(false);
+        };
+        fetchProfile();
     }, []);
 
-    const checkUser = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            router.push("/login");
-            return;
-        }
-
-        // Fetch user profile
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-
-        // Verify user has client role
-        if (profile?.role !== 'client') {
-            router.push(`/dashboard/${profile?.role || 'worker'}`);
-            return;
-        }
-
-        setUser(user);
-        setProfile(profile);
-        setLoading(false);
-    };
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        router.push("/");
-    };
-
     if (loading) {
-        return (
-            <div className="dashboard-container">
-                <div className="loading">Loading your dashboard...</div>
-            </div>
-        );
+        return <div className="loading">Loading your dashboard...</div>;
     }
 
     return (
-        <div className="dashboard-container">
-            {/* Header */}
-            <header className="dashboard-header">
-                <div className="header-content">
-                    <div className="logo-section">
-                        <Heart size={32} color="var(--secondary-color)" />
-                        <h1>Time For Hope</h1>
-                    </div>
-                    <div className="user-section">
-                        <div className="user-info">
-                            <User size={20} />
-                            <span>{profile?.full_name || user?.email}</span>
-                            <span className="role-badge client">Client</span>
-                        </div>
-                        <button onClick={handleLogout} className="btn-secondary">
-                            <LogOut size={18} />
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            {/* Main Content */}
-            <main className="dashboard-main">
-                <div className="welcome-section">
-                    <h2>Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}! 👋</h2>
-                    <p>Here's an overview of your care and support services.</p>
-                </div>
+        <>
+            <div className="welcome-section">
+                <h2>Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}!</h2>
+                <p>Here's an overview of your care and support services.</p>
+            </div>
 
                 {/* Quick Stats */}
                 <div className="stats-grid">
@@ -172,82 +124,13 @@ export default function ClientDashboard() {
                         </div>
                     </div>
                 </div>
-            </main>
 
             <style jsx>{`
-        .dashboard-container {
-          min-height: 100vh;
-          background: var(--accent-color);
-        }
-
         .loading {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-          font-size: 18px;
-          color: var(--primary-color);
-        }
-
-        .dashboard-header {
-          background: white;
-          border-bottom: 1px solid var(--border-color);
-          padding: 16px 24px;
-          box-shadow: var(--shadow-sm);
-        }
-
-        .header-content {
-          max-width: 1400px;
-          margin: 0 auto;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .logo-section {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .logo-section h1 {
-          font-size: 24px;
-          margin: 0;
-          color: var(--primary-color);
-        }
-
-        .user-section {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-        }
-
-        .user-info {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 8px 16px;
-          background: var(--accent-color);
-          border-radius: var(--radius-md);
-        }
-
-        .role-badge {
-          padding: 4px 12px;
-          border-radius: var(--radius-sm);
-          font-size: 12px;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-
-        .role-badge.client {
-          background: #dbeafe;
-          color: #1e40af;
-        }
-
-        .dashboard-main {
-          max-width: 1400px;
-          margin: 0 auto;
-          padding: 32px 24px;
+          text-align: center;
+          padding: 60px;
+          font-size: 16px;
+          color: #64748b;
         }
 
         .welcome-section {
@@ -426,11 +309,6 @@ export default function ClientDashboard() {
         }
 
         @media (max-width: 768px) {
-          .header-content {
-            flex-direction: column;
-            gap: 16px;
-          }
-
           .stats-grid {
             grid-template-columns: 1fr;
           }
@@ -440,6 +318,6 @@ export default function ClientDashboard() {
           }
         }
       `}</style>
-        </div>
+        </>
     );
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import DashboardLayout from "@/components/DashboardLayout";
+
 import {
   Send,
   Clock,
@@ -132,7 +132,7 @@ export default function AdminSigningPage() {
   };
 
   return (
-    <DashboardLayout role="admin">
+    <>
       <div className="welcome-banner">
         <div className="banner-content">
           <h1>Signing Requests</h1>
@@ -502,6 +502,6 @@ export default function AdminSigningPage() {
           border: 1px solid var(--border-color);
         }
       `}</style>
-    </DashboardLayout>
+    </>
   );
 }

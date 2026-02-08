@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import DashboardLayout from "@/components/DashboardLayout";
+
 import { getSupabase } from "@/lib/supabase";
 import {
   ArrowLeft,
@@ -131,7 +131,7 @@ function NewSigningRequestContent() {
   const selectedTemplate = templates.find(t => t.id === formData.templateId);
 
   return (
-    <DashboardLayout role="admin">
+    <>
       <div className="page-header">
         <Link href="/dashboard/admin/signing" className="back-link">
           <ArrowLeft size={20} />
@@ -525,7 +525,7 @@ function NewSigningRequestContent() {
           }
         }
       `}</style>
-    </DashboardLayout>
+    </>
   );
 }
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import DashboardLayout from "@/components/DashboardLayout";
+
 import { getSupabase } from "@/lib/supabase";
 import { FileText, Plus, Upload, Edit, Trash2, Eye, ChevronRight } from "lucide-react";
 
@@ -65,7 +65,7 @@ export default function AdminDocumentsPage() {
   };
 
   return (
-    <DashboardLayout role="admin">
+    <>
       <div className="welcome-banner">
         <div className="banner-content">
           <h1>Document Templates</h1>
@@ -631,6 +631,6 @@ export default function AdminDocumentsPage() {
           background: #f8fafc;
         }
       `}</style>
-    </DashboardLayout>
+    </>
   );
 }

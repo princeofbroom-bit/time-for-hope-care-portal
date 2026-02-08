@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import DashboardLayout from "@/components/DashboardLayout";
+
 import { getSupabase } from "@/lib/supabase";
 import { Users, Search, ChevronRight, UserPlus, Filter } from "lucide-react";
 
@@ -62,7 +62,7 @@ export default function WorkersPage() {
   };
 
   return (
-    <DashboardLayout role="admin">
+    <>
       <div className="page-header">
         <div className="header-content">
           <h1>Users</h1>
@@ -345,6 +345,6 @@ export default function WorkersPage() {
           color: var(--primary-color);
         }
       `}</style>
-    </DashboardLayout>
+    </>
   );
 }
