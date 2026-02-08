@@ -1,37 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-
-// Helper to create authenticated Supabase client
-async function getSupabaseClient() {
-  const cookieStore = await cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
-        },
-      },
-    }
-  );
-}
+import { getSupabaseServer } from '@/lib/supabase-server';
 
 // GET /api/documents/templates - List all templates
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await getSupabaseClient();
+    const supabase = await getSupabaseServer();
 
-    // Check authentication
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    // Verify authentication server-side (getUser validates JWT, getSession does not)
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -71,17 +48,22 @@ export async function GET(request: NextRequest) {
 // POST /api/documents/templates - Create a new template
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await getSupabaseClient();
+    const supabase = await getSupabaseServer();
 
-    // Check authentication
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    // Verify authentication server-side (getUser validates JWT, getSession does not)
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user is admin
-    const userRole = session.user.user_metadata?.role;
-    if (userRole !== 'admin') {
+    // Check role from database (user_metadata is client-mutable and MUST NOT be trusted)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile?.role || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
@@ -106,7 +88,7 @@ export async function POST(request: NextRequest) {
         form_schema,
         requires_witness: requires_witness || false,
         expiry_months,
-        created_by: session.user.id,
+        created_by: user.id,
       })
       .select()
       .single();

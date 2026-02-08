@@ -1,6 +1,5 @@
 "use client";
 
-
 import { FileText, GraduationCap, CheckCircle } from "lucide-react";
 
 export default function WorkerDashboard() {

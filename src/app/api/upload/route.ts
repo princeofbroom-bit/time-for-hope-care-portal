@@ -1,17 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 export const dynamic = 'force-dynamic';
 import { validateFile } from "@/lib/fileValidation";
-import { getSupabase } from "@/lib/supabase";
+import { getSupabaseServer } from '@/lib/supabase-server';
 
 export async function POST(req: NextRequest) {
     try {
+        const supabase = await getSupabaseServer();
+
+        // Verify authentication server-side
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const formData = await req.formData();
         const file = formData.get("file") as File;
         const docId = formData.get("docId") as string;
-        const userId = formData.get("userId") as string;
 
         if (!file) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 });
+        }
+
+        if (!docId) {
+            return NextResponse.json({ error: "No document ID provided" }, { status: 400 });
         }
 
         // Convert file to Uint8Array for deep inspection
@@ -25,19 +36,17 @@ export async function POST(req: NextRequest) {
         }
 
         // 2. Malware Scanning Placeholder (for < 3.5MB)
-        // In production, we would call the Cloudmersive API here.
         if (file.size < 3.5 * 1024 * 1024) {
             console.log(`[Security] Triggering malware scan for ${file.name}`);
-            // await scanFile(buffer); 
+            // await scanFile(buffer);
         } else {
             console.log(`[Security] Large file (${(file.size / 1024 / 1024).toFixed(2)}MB) passed deep inspection. Marked for Admin Review.`);
         }
 
-        // 3. Secure Storage (Randomized filename)
+        // 3. Secure Storage (use authenticated user.id, not client-provided userId)
         const fileExt = file.name.split('.').pop();
-        const fileName = `${userId}/${docId}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const fileName = `${user.id}/${docId}_${crypto.randomUUID()}.${fileExt}`;
 
-        const supabase = getSupabase();
         const { data, error } = await supabase.storage
             .from('compliance-docs')
             .upload(fileName, buffer, {
@@ -49,8 +58,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Storage error: " + error.message }, { status: 500 });
         }
 
-        // 4. Update Database (Placeholder logic)
-        // Here we would update the workers table with the file path.
         console.log(`[Success] File uploaded to storage: ${data.path}`);
 
         return NextResponse.json({

@@ -8,25 +8,26 @@ import { Heart, LayoutDashboard, FileText, GraduationCap, Users, Settings, LogOu
 
 export default function DashboardLayout({
   children,
-  role = "worker"
+  role = "worker",
+  userEmail: initialEmail
 }: {
   children: React.ReactNode;
   role?: "admin" | "worker" | "client";
+  userEmail?: string | null;
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(initialEmail ?? null);
 
   useEffect(() => {
-    // Use getSession() instead of getUser() - reads from local storage (instant)
-    // Middleware already validated auth, this is just for displaying the email
+    if (initialEmail) return; // Already provided by server layout
     const supabase = getSupabase();
     supabase.auth.getSession().then(({ data }: any) => {
       if (data?.session) {
         setUserEmail(data.session.user.email ?? null);
       }
     });
-  }, []);
+  }, [initialEmail]);
 
   const handleLogout = async () => {
     const supabase = getSupabase();

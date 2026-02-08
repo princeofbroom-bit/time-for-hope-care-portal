@@ -1,38 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import { v4 as uuidv4 } from 'uuid';
-
-// Helper to create authenticated Supabase client
-async function getSupabaseClient() {
-  const cookieStore = await cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
-        },
-      },
-    }
-  );
-}
+import { getSupabaseServer } from '@/lib/supabase-server';
 
 // GET /api/documents/signing-requests - List signing requests
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await getSupabaseClient();
+    const supabase = await getSupabaseServer();
 
-    // Check authentication
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    // Verify authentication server-side (getUser validates JWT, getSession does not)
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -43,7 +20,14 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    const userRole = session.user.user_metadata?.role;
+    // Check role from database (user_metadata is client-mutable and MUST NOT be trusted)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    const userRole = profile?.role;
 
     // Build query
     let query = supabase
@@ -61,8 +45,8 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     // If not admin, only show user's own requests
-    if (userRole !== 'admin') {
-      query = query.eq('recipient_user_id', session.user.id);
+    if (!['admin', 'super_admin'].includes(userRole || '')) {
+      query = query.eq('recipient_user_id', user.id);
     } else if (recipientUserId) {
       query = query.eq('recipient_user_id', recipientUserId);
     }
@@ -88,17 +72,22 @@ export async function GET(request: NextRequest) {
 // POST /api/documents/signing-requests - Create a new signing request
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await getSupabaseClient();
+    const supabase = await getSupabaseServer();
 
-    // Check authentication
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    // Verify authentication server-side (getUser validates JWT, getSession does not)
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user is admin
-    const userRole = session.user.user_metadata?.role;
-    if (userRole !== 'admin') {
+    // Check role from database (user_metadata is client-mutable and MUST NOT be trusted)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile?.role || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
@@ -154,7 +143,7 @@ export async function POST(request: NextRequest) {
         access_token: accessToken,
         access_method,
         expires_at: expiresAt,
-        sent_by: session.user.id,
+        sent_by: user.id,
         status: 'pending',
       })
       .select()
@@ -173,7 +162,7 @@ export async function POST(request: NextRequest) {
         template_id,
         recipient_email,
         access_method,
-        created_by: session.user.id,
+        created_by: user.id,
       },
     });
 

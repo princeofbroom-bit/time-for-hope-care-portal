@@ -1,5 +1,13 @@
 import DashboardLayout from "@/components/DashboardLayout";
+import { getSupabaseServer } from "@/lib/supabase-server";
 
-export default function WorkerDashboardLayout({ children }: { children: React.ReactNode }) {
-  return <DashboardLayout role="worker">{children}</DashboardLayout>;
+export default async function WorkerDashboardLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await getSupabaseServer();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  return (
+    <DashboardLayout role="worker" userEmail={user?.email ?? null}>
+      {children}
+    </DashboardLayout>
+  );
 }
