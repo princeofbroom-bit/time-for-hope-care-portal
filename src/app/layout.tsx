@@ -13,8 +13,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Time For Hope | NDIS & Aged Care Support",
-  description: "A premium management platform for NDIS and Aged Care support services.",
+  title: "Time For Hope Care Portal",
+  description: "NDIS support platform for managing workers, clients, compliance documents, and electronic document signing.",
 };
 
 export default function RootLayout({
