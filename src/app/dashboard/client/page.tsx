@@ -5,6 +5,7 @@ import { getSupabase } from "@/lib/supabase";
 
 import { Calendar, FileText, User, Clock, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { StatCardSkeleton, CardGridSkeleton, SkeletonStyles } from "@/components/SkeletonLoader";
 
 export default function ClientDashboard() {
     const [profile, setProfile] = useState<any>(null);
@@ -28,7 +29,7 @@ export default function ClientDashboard() {
     }, []);
 
     if (loading) {
-        return <div className="loading">Loading your dashboard...</div>;
+        return <><StatCardSkeleton count={3} /><CardGridSkeleton count={3} /><SkeletonStyles /></>;
     }
 
     return (

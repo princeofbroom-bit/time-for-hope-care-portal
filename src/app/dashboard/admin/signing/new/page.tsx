@@ -15,6 +15,7 @@ import {
   AlertCircle,
   CheckCircle
 } from "lucide-react";
+import { CardGridSkeleton, SkeletonStyles } from "@/components/SkeletonLoader";
 
 interface DocumentTemplate {
   id: string;
@@ -161,7 +162,7 @@ function NewSigningRequestContent() {
           <section className="form-section">
             <h2><FileText size={20} /> Select Document</h2>
             {loading ? (
-              <div className="loading-text">Loading templates...</div>
+              <><CardGridSkeleton count={3} /><SkeletonStyles /></>
             ) : templates.length === 0 ? (
               <div className="empty-text">
                 No document templates available. <Link href="/dashboard/admin/documents">Create one first</Link>.

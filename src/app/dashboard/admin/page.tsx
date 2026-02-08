@@ -8,6 +8,7 @@ import {
   Users, AlertCircle, TrendingUp, ChevronRight,
   FileText, PenTool, UserPlus, Shield, Clock, CheckCircle, XCircle
 } from "lucide-react";
+import { DashboardSkeleton } from "@/components/SkeletonLoader";
 
 interface DashboardStats {
   totalUsers: number;
@@ -99,7 +100,7 @@ export default function AdminDashboard() {
       </div>
 
       {loading ? (
-        <div className="loading-state">Loading dashboard...</div>
+        <DashboardSkeleton />
       ) : (
         <>
           {/* Main Stats Grid */}

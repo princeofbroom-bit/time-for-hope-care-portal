@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { getSupabase } from "@/lib/supabase";
 import { FileText, Plus, Upload, Edit, Trash2, Eye, ChevronRight } from "lucide-react";
+import { CardGridSkeleton, SkeletonStyles } from "@/components/SkeletonLoader";
 
 interface DocumentTemplate {
   id: string;
@@ -115,7 +116,7 @@ export default function AdminDocumentsPage() {
         </div>
 
         {loading ? (
-          <div className="loading-state">Loading templates...</div>
+          <><CardGridSkeleton count={3} /><SkeletonStyles /></>
         ) : (
           <div className="templates-grid">
             {templates.map((template) => (

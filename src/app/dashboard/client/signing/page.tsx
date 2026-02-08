@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 import { FileText, Clock, CheckCircle, AlertCircle, ChevronRight, Download } from "lucide-react";
+import { CardGridSkeleton, SkeletonStyles } from "@/components/SkeletonLoader";
 
 interface PendingDocument {
   id: string;
@@ -139,7 +140,7 @@ export default function ClientSigningPage() {
       </div>
 
       {loading ? (
-        <div className="loading-state">Loading documents...</div>
+        <><CardGridSkeleton count={3} /><SkeletonStyles /></>
       ) : activeTab === "pending" ? (
         <section className="documents-section">
           {pendingDocs.length === 0 ? (

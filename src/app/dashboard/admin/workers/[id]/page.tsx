@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { getSupabase } from "@/lib/supabase";
 import { ArrowLeft, User, Mail, Phone, Calendar, Shield, Edit, Trash2 } from "lucide-react";
+import { DetailSkeleton, SkeletonStyles } from "@/components/SkeletonLoader";
 
 interface UserProfile {
   id: string;
@@ -68,7 +69,8 @@ export default function WorkerDetailPage() {
   if (loading) {
     return (
       <>
-        <div className="loading-state">Loading user details...</div>
+        <DetailSkeleton />
+        <SkeletonStyles />
       </>
     );
   }

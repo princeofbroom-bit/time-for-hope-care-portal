@@ -15,6 +15,7 @@ import {
   Search,
   Filter
 } from "lucide-react";
+import { TableSkeleton, SkeletonStyles } from "@/components/SkeletonLoader";
 
 interface SigningRequest {
   id: string;
@@ -216,7 +217,7 @@ export default function AdminSigningPage() {
         </div>
 
         {loading ? (
-          <div className="loading-state">Loading requests...</div>
+          <><TableSkeleton rows={5} columns={5} /><SkeletonStyles /></>
         ) : (
           <div className="table-container">
             <table className="requests-table">

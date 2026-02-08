@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { getSupabase } from "@/lib/supabase";
 import { Users, Search, ChevronRight, UserPlus, Filter } from "lucide-react";
+import { TableSkeleton, SkeletonStyles } from "@/components/SkeletonLoader";
 
 interface Worker {
   id: string;
@@ -121,7 +122,7 @@ export default function WorkersPage() {
       {/* Users Table */}
       <div className="table-container">
         {loading ? (
-          <div className="loading-state">Loading users...</div>
+          <><TableSkeleton rows={5} columns={4} /><SkeletonStyles /></>
         ) : filteredWorkers.length === 0 ? (
           <div className="empty-state">
             <Users size={48} color="#cbd5e1" />
