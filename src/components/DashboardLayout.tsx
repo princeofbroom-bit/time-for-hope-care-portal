@@ -20,9 +20,9 @@ export default function DashboardLayout({
   useEffect(() => {
     const fetchUser = async () => {
       const supabase = getSupabase();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUserEmail(session.user.email ?? null);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserEmail(user.email ?? null);
       }
     };
     fetchUser();

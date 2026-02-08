@@ -41,52 +41,43 @@ export default function AdminDashboard() {
     const supabase = getSupabase();
 
     try {
-      // Fetch user counts by role
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, role, full_name, updated_at');
+      // Run all queries in parallel for faster loading
+      const [profilesResult, signingResult, templatesResult] = await Promise.all([
+        supabase.from('profiles').select('id, role, full_name, updated_at'),
+        supabase.from('signing_requests').select('id, status'),
+        supabase.from('document_templates').select('id').eq('is_active', true),
+      ]);
 
-      const workers = profiles?.filter(p => p.role === 'worker') || [];
-      const clients = profiles?.filter(p => p.role === 'client') || [];
-      const admins = profiles?.filter(p => p.role === 'admin' || p.role === 'super_admin') || [];
+      const profiles = profilesResult.data || [];
+      const signingRequests = signingResult.data || [];
+      const templates = templatesResult.data || [];
 
-      // Fetch signing request stats
-      const { data: signingRequests } = await supabase
-        .from('signing_requests')
-        .select('id, status');
+      const workers = profiles.filter(p => p.role === 'worker');
+      const clients = profiles.filter(p => p.role === 'client');
+      const admins = profiles.filter(p => p.role === 'admin' || p.role === 'super_admin');
 
-      const pending = signingRequests?.filter(s => ['pending', 'sent', 'viewed'].includes(s.status)) || [];
-      const completed = signingRequests?.filter(s => s.status === 'signed') || [];
+      const pending = signingRequests.filter(s => ['pending', 'sent', 'viewed'].includes(s.status));
+      const completed = signingRequests.filter(s => s.status === 'signed');
 
-      // Fetch document templates count
-      const { data: templates } = await supabase
-        .from('document_templates')
-        .select('id')
-        .eq('is_active', true);
-
-      // Fetch recent users (from auth.users via profiles)
-      const { data: recentProfiles } = await supabase
-        .from('profiles')
-        .select('id, role, full_name, updated_at')
-        .order('updated_at', { ascending: false })
-        .limit(5);
-
-      // Get emails for recent users
-      const recentUsers = recentProfiles?.map(p => ({
-        id: p.id,
-        email: p.full_name || 'No name',
-        role: p.role,
-        created_at: p.updated_at,
-      })) || [];
+      // Reuse profiles data for recent users (sorted by updated_at, top 5)
+      const recentUsers = [...profiles]
+        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+        .slice(0, 5)
+        .map(p => ({
+          id: p.id,
+          email: p.full_name || 'No name',
+          role: p.role,
+          created_at: p.updated_at,
+        }));
 
       setStats({
-        totalUsers: profiles?.length || 0,
+        totalUsers: profiles.length,
         workers: workers.length,
         clients: clients.length,
         admins: admins.length,
         pendingSignatures: pending.length,
         completedSignatures: completed.length,
-        totalDocuments: templates?.length || 0,
+        totalDocuments: templates.length,
         recentUsers,
       });
     } catch (error) {
